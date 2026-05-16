@@ -1,51 +1,58 @@
 # RAG Retrieval & Generation Dashboard
 
-> An end-to-end analysis platform for evaluating neural reranking in biomedical Retrieval-Augmented Generation pipelines, built as part of a master's thesis on the BioASQ benchmark.
+> An end-to-end interactive platform for evaluating how neural reranking affects generation quality in biomedical Retrieval-Augmented Generation pipelines — built around the BioASQ benchmark.
 
 ---
 
-## Overview
+## Why This Exists
 
-This full-stack application provides an interactive environment for running queries through a complete RAG pipeline and deeply analyzing both retrieval and generation quality across multiple reranker configurations. It was designed to answer a central research question: **does neural reranking meaningfully improve generation quality over BM25 alone?**
+Getting good answers from a RAG system isn't just about the generator — it's about **what you retrieve**. This dashboard was built to answer one concrete research question:
 
-The dashboard covers the full evaluation loop — from live query execution, to retrieval metric comparison, generation quality scoring, statistical significance testing, and failure analysis.
+> **Does neural reranking meaningfully improve generation quality over BM25 alone, or is the difference just noise?**
+
+The tool lets you run live queries through the full pipeline, compare every reranker configuration side by side, stress-test your results with statistical significance tests, and drill into exactly where and why a model fails. It's designed to give researchers and engineers the visibility needed to make informed decisions about reranker selection, fine-tuning, and retrieval depth — all of which directly impact the quality of generated answers.
 
 ---
 
 ## Pages
 
-### Query Interface
-Submit any biomedical question, select a reranker model, and receive a generated answer alongside retrieval and generation metrics in real time.
+### 1 · Query Interface
 
-![Query Interface](https://private-user-images.githubusercontent.com/92827d54-323a-4214-95e4-09b9ed665ace)
+Submit any biomedical question, choose a reranker model, and get a generated answer alongside live retrieval and generation metrics. The main entry point for exploratory analysis.
 
----
-
-### Retrieval Metrics
-In-depth retrieval analysis per model and per query type (factoid, yes/no, list, summary). Tracks MRR, Recall@k, NDCG, and more across all pipeline configurations.
-
-![Retrieval Metrics](https://private-user-images.githubusercontent.com/5e2f2613-4acb-8e80-b7384222d744)
+![Query Interface](https://github.com/user-attachments/assets/92827d54-323a-4214-95e4-09b9ed665ace)
 
 ---
 
-### Generation Metrics
-Side-by-side comparison of generation quality across all reranker models. Metrics include RAGAS Faithfulness, BERTScore, and BioASQ-native scores (accuracy, mean F1 by question type). Best-performing model per metric is automatically highlighted.
+### 2 · Retrieval Metrics
 
-![Generation Metrics](https://private-user-images.githubusercontent.com/536fd2f1-4bc3-4fc2-a53f-e46499b43dd9)
+Deep-dive retrieval analysis across all pipeline configurations. Compares models on MRR, Recall@k, NDCG and more, with a per-query-type breakdown (factoid, yes/no, list, summary) to reveal where each reranker earns its place.
 
----
-
-### Statistical Analysis
-Runs Wilcoxon signed-rank tests to determine whether reranking improvements are statistically significant or within noise. Answers the core thesis question with rigorous hypothesis testing.
-
-![Statistical Analysis](https://private-user-images.githubusercontent.com/3e765b54-8792-44d8-b9a6-39da52faa266)
+![Retrieval Metrics](https://github.com/user-attachments/assets/5e2f2613-8e9d-4acb-8e80-b7384222d744)
 
 ---
 
-### Failure Analysis
-Surfaces individual queries where a given reranker underperformed BM25 or another baseline. Helps identify systematic failure modes and informs iterative model improvement.
+### 3 · Generation Metrics
 
-![Failure Analysis](https://private-user-images.githubusercontent.com/89db9ce4-5732-458f-acae-42fc69f0fa9a)
+Side-by-side generation quality comparison across all reranker models. Covers RAGAS Faithfulness, BERTScore, and BioASQ-native scores (accuracy, mean F1 by question type). Best-performing model per metric is automatically highlighted so the winner is always obvious at a glance.
+
+![Generation Metrics](https://github.com/user-attachments/assets/536fd2f1-4bc3-4fc2-a53f-e46499b43dd9)
+
+---
+
+### 4 · Statistical Analysis
+
+Runs Wilcoxon signed-rank tests across all model pairs to determine whether observed improvements are statistically significant or fall within noise. This is the page that answers the core thesis question with rigor, not just intuition.
+
+![Statistical Analysis](https://github.com/user-attachments/assets/3e765b54-8792-44d8-b9a6-39da52faa266)
+
+---
+
+### 5 · Failure Analysis
+
+Surfaces individual queries where a reranker underperformed BM25 or another baseline on generation metrics. Identifying *where* a model fails is the first step to understanding *why* — and this page makes that systematic rather than anecdotal.
+
+![Failure Analysis](https://github.com/user-attachments/assets/89db9ce4-5732-458f-acae-42fc69f0fa9a)
 
 ---
 
@@ -53,68 +60,123 @@ Surfaces individual queries where a given reranker underperformed BM25 or anothe
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vite + React + TypeScript + Tailwind CSS |
-| Backend | Python · FastAPI (Uvicorn) |
-| IR / Retrieval | Pyserini · BM25 · Neural rerankers (monoT5, duoT5, LiT5, Qwen3) |
-| Generation | Llama-3.1-8B via HuggingFace |
+| Frontend | Vite · React · TypeScript · Tailwind CSS |
+| Backend | Python · FastAPI · Uvicorn |
+| Retrieval | Pyserini · BM25 · monoT5 · duoT5 · LiT5-Distill · Qwen3 |
+| Generation | Llama-3.1-8B (HuggingFace Transformers) |
 | Evaluation | RAGAS · BERTScore · BioASQ metrics · SciPy (Wilcoxon) |
-| Environment | Conda (`pyml`) · CUDA · RTX 3060 |
+| Environment | Conda · CUDA · Linux |
+
+---
+
+## Setup & Installation
+
+### Requirements
+
+- Linux (tested on Ubuntu) with a CUDA-capable GPU
+- [Miniconda or Anaconda](https://docs.conda.io/en/latest/miniconda.html)
+- Node.js ≥ 18 and npm
+- Python 3.10+
+
+---
+
+### 1 · Clone the repository
+
+```bash
+git clone https://github.com/your-username/reranking_project.git
+cd reranking_project
+```
+
+---
+
+### 2 · Set up the Python environment
+
+```bash
+conda create -n pyml python=3.10 -y
+conda activate pyml
+```
+
+Install core Python dependencies:
+
+```bash
+pip install fastapi uvicorn
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install transformers accelerate peft
+pip install pyserini
+pip install ragas datasets
+pip install bert-score
+pip install scipy numpy pandas
+```
+
+> **Note on Pyserini:** it requires Java 11+. Install it with:
+> ```bash
+> sudo apt install default-jdk -y
+> ```
+
+---
+
+### 3 · Install frontend dependencies
+
+```bash
+cd application/frontend
+npm install
+```
 
 ---
 
 ## Running the Application
 
-The app has two processes: a **Python/FastAPI backend** and a **Vite/React frontend**. Both are launched from the project root.
+The app runs as two separate processes: a Python backend (FastAPI) and a React frontend (Vite). Open two terminal windows or use the one-liner below.
 
-### Prerequisites
-
-- [Conda](https://docs.conda.io/) with a `pyml` environment containing all Python dependencies
-- Node.js + npm installed for the frontend
-
-### Start the Backend
+### Backend
 
 ```bash
-cd ~/Desktop/reranking_project
+cd reranking_project
 conda activate pyml
 python3 -m uvicorn application.backend.main:app --port 8765
 ```
 
-The API will be available at `http://localhost:8765`.
+API available at → `http://localhost:8765`
 
-### Start the Frontend
+### Frontend
 
 ```bash
-cd ~/Desktop/reranking_project/application/frontend
+cd reranking_project/application/frontend
 npm run dev
 ```
 
-The dashboard will be available at `http://localhost:5173` (or whichever port Vite assigns).
+Dashboard available at → `http://localhost:5173`
 
-### One-liner (with Kitty terminal)
+---
 
-If you use the [Kitty](https://sw.kovidgoyal.net/kitty/) terminal, both processes can be launched simultaneously:
+### Launch both at once (Kitty terminal)
+
+If you use the [Kitty](https://sw.kovidgoyal.net/kitty/) terminal with Fish shell, this script opens both processes in separate windows simultaneously:
 
 ```bash
-# Backend
+#!/bin/bash
+PROJECT_DIR="$HOME/Desktop/reranking_project"
+
+# Backend window
 kitty fish -c "
-  cd ~/Desktop/reranking_project
+  cd $PROJECT_DIR
   conda activate pyml
   python3 -m uvicorn application.backend.main:app --port 8765
   exec fish
 " &
 
-# Frontend
+# Frontend window
 kitty fish -c "
-  cd ~/Desktop/reranking_project/application/frontend
+  cd $PROJECT_DIR/application/frontend
   npm run dev
   exec fish
 " &
 ```
 
-Each process opens in its own Kitty window with a persistent Fish shell after the process exits.
+Each window stays open as a persistent Fish shell after the process exits, so you can inspect logs or restart without opening a new terminal.
 
 ---
 
-## Context
+## Research Context
 
-Built as the experimental evaluation tool for a master's thesis investigating neural reranking for biomedical RAG on the [BioASQ](http://bioasq.org/) benchmark. The pipeline uses BM25 as a fixed first-stage retriever and ablates neural rerankers as the variable, with Llama-3.1-8B as the fixed generator throughout.
+Built as the experimental evaluation tool for a master's thesis on neural reranking for biomedical RAG using the [BioASQ](http://bioasq.org/) benchmark. The pipeline fixes BM25 as the first-stage retriever and Llama-3.1-8B as the generator, treating the reranker as the sole ablation variable across all experiments.
