@@ -83,7 +83,7 @@ Surfaces individual queries where a reranker underperformed BM25 or another base
 ### 1 · Clone the repository
 
 ```bash
-git clone https://github.com/your-username/reranking_project.git
+git clone github.com/Oussama-Ouarezki/thesis_presentation/
 cd reranking_project
 ```
 
